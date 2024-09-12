@@ -3,7 +3,7 @@
 """
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors  # Importar el módulo de colores
+import matplotlib.colors as mcolors
 import seaborn as sns
 import numpy as np
 from bokeh.plotting import figure, show, output_file
@@ -13,7 +13,6 @@ from bokeh.plotting import figure, show, output_file
 # Cargar el archivo CSV en un DataFrame
 df_original = pd.read_csv('./SetDatos/Datos_MineriaDatos.csv', encoding='latin1') #Debido a el formato en que esta la información se hace la busqueda del encodificador correcto del set de datos
 
-# Realiza una copia exacta del DataFrame original sacado del Set de Datos
 df_modificable = df_original.copy()
 
 """
@@ -67,7 +66,6 @@ df_modificable['Diagnostico'] = df_modificable['Diagnostico'].map(json_Diagnosti
 
 
 etapas_valor_texto = {v: k for k, v in json_Etapas_valor_unico.items()}
-
 # Reemplazar los valores numéricos en la columna 'Etapa' con sus equivalentes en texto
 df_modificable['Etapa_Texto'] = df_modificable['Etapa'].map(etapas_valor_texto)
 
@@ -121,34 +119,21 @@ plt.show()
 # Agrupar por Provincia y sumar los atendidos
 grouped_data = df_modificable.groupby('Departamento')['Atendidos'].sum()
 
-# Crear gráfico de torta
 fig, ax = plt.subplots(figsize=(10, 6))
-
-# Colores para el gráfico
 colors = plt.cm.Paired.colors
 
-# Graficar la torta y mostrar los números de los Departamentos
-departamentos = df_modificable['Departamento'].unique()  # Números de departamento para las etiquetas
+departamentos = df_modificable['Departamento'].unique() 
 wedges, texts = ax.pie(grouped_data, labels=departamentos, startangle=90, colors=colors)
 
-# Crear la tabla de resumen con el porcentaje y el color
-# Obtener los colores en formato hexadecimal (usamos get_facecolor() y convertimos correctamente)
-colors_hex = [mcolors.rgb2hex(wedge.get_facecolor()[:3]) for wedge in wedges]  # Tomamos los primeros 3 valores (RGB)
-
-# Crear la información de la tabla (excepto los colores, que se pintarán)
+colors_hex = [mcolors.rgb2hex(wedge.get_facecolor()[:3]) for wedge in wedges]
 table_data = [[f'{Departamento}', f'{atendido}'] for Departamento, atendido in zip(grouped_data.index, grouped_data)]
 
-# Agregar tabla a la gráfica
 tabla = ax.table(cellText=table_data, colLabels=["Departamento", "Atendidos"], loc="right", colColours=['#f5f5f5']*2, cellLoc='center')
 
-# Pintar las celdas de la columna de colores
 for i, color in enumerate(colors_hex):
     tabla.add_cell(i+1, 2, width=0.1, height=0.05, facecolor=color)  # Agregar celda pintada con el color respectivo
 
-# Agregar la columna de título "Color"
 tabla.add_cell(0, 2, width=0.1, height=0.05, text="Color", loc='center', facecolor='#f5f5f5')
-
-# Ajustar la posición del gráfico para que la tabla no se superponga
 plt.subplots_adjust(left=0.1, right=0.7)
 
 plt.title('Cantidad de Pacientes Atendidos por Departamento')
@@ -174,16 +159,10 @@ df_modificable = df_modificable.drop(columns=['Sexo'])
     Se hace la busqueda de datos que se encuentren nulos o esten vacias dentro de todas las columnas y se trae el index de la respectiva columna y el campo que hace falta
     En este caso el propio proyecto nos indica que no se encontraron informaciones con valores nan , null o cadenas vacias
 """
-# Buscar valores nulos
+
 nulos = df_modificable.isna()
-
-# Usar apply para aplicar una función map a cada columna y detectar cadenas vacías
 vacios = df_modificable.apply(lambda col: col.map(lambda x: isinstance(x, str) and x.strip() == ''))
-
-# Crear un nuevo DataFrame combinando nulos y vacíos
 nulos_o_vacios = nulos | vacios
-
-# Filtrar filas donde haya al menos un valor nulo o vacío
 df_nulos_vacios = df_modificable[nulos_o_vacios.any(axis=1)]
 
 # Mostrar el DataFrame con los valores nulos o vacíos
@@ -194,8 +173,6 @@ df_nulos_vacios = df_modificable[nulos_o_vacios.any(axis=1)]
 
     Se realiza el analisis de las variables referentes a las variables analisadas en la parte de estadistica descriptiva
 """
-
-#Eliminamos las variables que utilizamos para los graficos
 df_modificable = df_modificable.drop(columns=['Etapa_Texto'])
 
 # Calcular la matriz de correlación
@@ -203,16 +180,3 @@ correlacion = df_modificable.corr()
 
 # Mostrar la matriz de correlación
 print(correlacion)
-"""
-
-    Metodo del codo para definir la cantidad de cluster en mi algoritmo de predicción
-    Atraves del algoritmo de Kmeans y atraves de su propiedad de inercia .inertia_ ( calculo de error )
-    se grafica de manera lineal y de puntos
-
-    El numero de cluster es donde la linea empiece a tomar una linea recta ( se suaviza una curva )
-
-    Los centroides son la cantidad de variables a evaluar
-
-    La reduccion de la dimencionalidad a los datos esto con
-    sklearn.decomposition importado de PCA
-"""
