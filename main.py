@@ -70,6 +70,7 @@ etapas_valor_texto = {v: k for k, v in json_Etapas_valor_unico.items()}
 df_modificable['Etapa_Texto'] = df_modificable['Etapa'].map(etapas_valor_texto)
 
 
+
 # Resumen estadístico de la columna 'Atendidos'
 #resumen_estadistico = df_modificable['Atendidos'].describe()
 #print(resumen_estadistico)
@@ -100,6 +101,9 @@ df_modificable['Etapa_Texto'] = df_modificable['Etapa'].map(etapas_valor_texto)
 Se realiza el analisis de la información utilizando histograma en este caso para evaluar la variable de Etapa
 Se realiza el analisis de atendidos por departamentos
 """
+
+## FRECUENCIA DE LA CANTIDAD DE PERSONAS INDEPENDIENTEMENTE DEL DIAGNOSTICOS QUE VAN POR SALUD MENTAL 
+
 # Crear un histograma donde X sea la variable 'Etapa_Texto'
 plt.figure(figsize=(10, 6))
 sns.histplot(df_modificable['Etapa_Texto'], bins=len(json_Etapas_valor_unico), color='skyblue', edgecolor='black')
@@ -115,6 +119,9 @@ plt.xticks(rotation=45)
 # Mostrar el gráfico
 plt.tight_layout()
 plt.show()
+
+## DIAGRAMAS DE BARRAS CON CANTIDAD DE PERSONAS FILTRADOS POR DEPARTAMENTO Y SEGUN ESTO CUANTAS PERSONAS HAN SIDO ATENDIDOS
+
 
 # Agrupar por Provincia y sumar los atendidos
 grouped_data = df_modificable.groupby('Departamento')['Atendidos'].sum()
@@ -139,6 +146,24 @@ plt.subplots_adjust(left=0.1, right=0.7)
 plt.title('Cantidad de Pacientes Atendidos por Departamento')
 plt.show()
 
+## DIAGRAMAS DE BARRAS
+## DIAGRAMA DE REPRESENTACION DE LOS DIAGNOSTICOS POR CADA UNA DE LAS ETAPAS
+# Agrupar por Diagnostico y Etapa y contar la cantidad de personas
+conteo_etapas = df_modificable.groupby(['Diagnostico', 'Etapa_Texto']).size().unstack().fillna(0)
+
+# Crear el gráfico de barras
+ax = conteo_etapas.plot(kind='bar', figsize=(12, 7), colormap='tab20')
+
+plt.xlabel('Diagnóstico')
+plt.ylabel('Cantidad de Personas')
+plt.title('Cantidad de Personas por Etapa para Cada Diagnóstico')
+plt.xticks(rotation=0)  # Asegúrate de que las etiquetas estén horizontales
+plt.legend(title='Etapa', title_fontsize='13', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+# Mostrar el gráfico
+plt.tight_layout()
+plt.show()
 """
     2. Eliminar variables irrelevantes y redundantes
 
