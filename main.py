@@ -7,13 +7,6 @@ import matplotlib.colors as mcolors
 import seaborn as sns
 import numpy as np
 from bokeh.plotting import figure, show, output_file
-#import sklearn
-
-
-# Cargar el archivo CSV en un DataFrame
-df_original = pd.read_csv('./SetDatos/Datos_MineriaDatos.csv', encoding='latin1') #Debido a el formato en que esta la información se hace la busqueda del encodificador correcto del set de datos
-
-df_modificable = df_original.copy()
 
 """
     1. Integración de los datos
@@ -22,6 +15,12 @@ df_modificable = df_original.copy()
     Author: Victor Guevara
     Referencia del repositorio: https://github.com/VictorGuevaraP/Mineria-de-datos/blob/master/DAT%20SALUD%20MENTAL%20-%20ATENDIDOS.csv
 """
+
+# Cargar el archivo CSV en un DataFrame
+df_original = pd.read_csv('./SetDatos/Datos_MineriaDatos.csv', encoding='latin1') #Debido a el formato en que esta la información se hace la busqueda del encodificador correcto del set de datos
+
+df_modificable = df_original.copy()
+
 
 """
     Eliminar variables redundantes
@@ -46,6 +45,17 @@ json_Etapas_valor_unico = {Etapa: idx for idx, Etapa in enumerate(Etapas_unicos,
 
 Diagnosticos_unicos = df_original['Diagnostico'].unique()
 json_Diagnosticos_valor_unico = {Diagnostico: idx for idx, Diagnostico in enumerate(Diagnosticos_unicos, start=1)}
+
+print("#################### Mapa de Departamentos")
+print(json_departamento_valor_unico)
+print("#################### Mapa de Provincias")
+print(json_provincias_valor_unico)
+print("#################### Mapa de Sexos")
+print(json_sexos_valor_unico)
+print("#################### Mapa de Etapas")
+print(json_Etapas_valor_unico)
+print("#################### Mapa de Diagnosticos")
+print(json_Diagnosticos_valor_unico)
 
 
 """
@@ -122,7 +132,6 @@ plt.show()
 
 ## DIAGRAMAS DE BARRAS CON CANTIDAD DE PERSONAS FILTRADOS POR DEPARTAMENTO Y SEGUN ESTO CUANTAS PERSONAS HAN SIDO ATENDIDOS
 
-
 # Agrupar por Provincia y sumar los atendidos
 grouped_data = df_modificable.groupby('Departamento')['Atendidos'].sum()
 
@@ -164,6 +173,16 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 # Mostrar el gráfico
 plt.tight_layout()
 plt.show()
+
+df_modificable.hist()
+plt.show()
+
+sns.pairplot(df_modificable.dropna(), height=4,  # Reemplaza 'size' por 'height'
+            vars=['Departamento', 'Atendidos', 'Atenciones'], kind='scatter')
+plt.show()
+
+
+
 """
     2. Eliminar variables irrelevantes y redundantes
 
@@ -202,6 +221,3 @@ df_modificable = df_modificable.drop(columns=['Etapa_Texto'])
 
 # Calcular la matriz de correlación
 correlacion = df_modificable.corr()
-
-# Mostrar la matriz de correlación
-print(correlacion)
